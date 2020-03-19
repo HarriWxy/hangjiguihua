@@ -21,7 +21,7 @@ client.takeoffAsync()
 coll=client.getCollisionInfo()
 while(coll.has_collided==False):
     client.moveByVelocityAsync(1,1,-1,2)
-     
+    print(client.getGpsData())
 print(coll.position) 
 
 # path=np.array([[-10, 10, -10, 5],[-15, 15, -15, 5],[-20,-20, -20, 5]]).join()
