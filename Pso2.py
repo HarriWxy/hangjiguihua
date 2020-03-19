@@ -11,7 +11,8 @@ class Grid(object):
         for i in range(dim):
             temp=[]
             for j in range(dim):
-                temp.append(random.randint(0,10))
+                temp.append(random.randint(0,1))
+                # 0 1矩阵,1代表障碍
             grid.append(temp)
 # 粒子群种群
 class Pso(object):
