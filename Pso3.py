@@ -2,7 +2,7 @@
 import numpy as np 
 import random
 import matplotlib.pyplot as plt 
-
+# 重新画格子吧
 class Grid(object):
     grid=[]
     def __init__(self,dim):
@@ -80,11 +80,11 @@ class Pso(object):
     # 标注图像中的路径
     def trans(self):
         temp=0
-        for i in range(self.dim):
-            # if (self.gbest[i]>10):
-            #     self.gbest[i]=9
-            # if (self.gbest[i]<0):
-            #     self.gbest[i]=0
+        for i in range(self.dim): # 这里需要限制一下范围，但我不记得为什么
+            if (self.gbest[i]>9):
+                self.gbest[i]=9
+            if (self.gbest[i]<0):
+                self.gbest[i]=0
             grid[i][int(self.gbest[i])]=50
             for j in range(min(temp,int(self.gbest[i])),max(temp,int(self.gbest[i]))):
                 grid[i][j]=30
