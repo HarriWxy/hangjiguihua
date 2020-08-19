@@ -15,7 +15,7 @@ class Grid(object):
 # 粒子群种群
 class Pso(object):
     # p_num:粒子数目,dim:维度,max_iter:最大迭代次数,x,y为目的地
-    def __init__(self,p_num,dim,max_iter,x,y): 
+    def __init__(self,p_num,max_iter,x,y): 
         self.grid=Grid(dim).grid # 生成的网格图
         self.w = 0.8
         self.c1 = 2
@@ -23,7 +23,7 @@ class Pso(object):
         self.r1 = 0.6
         self.r2 = 0.3
         self.p_num = p_num  # 粒子数量
-        self.dim = dim  # 搜索维度
+        self.dim = 2*x+y  # 搜索维度,调参数,考虑用ai训练
         self.max_iter = max_iter  # 迭代次数
         self.x = np.zeros((self.p_num, self.dim))  # 所有粒子的位置和速度
         self.v = np.zeros((self.p_num, self.dim))
@@ -36,6 +36,7 @@ class Pso(object):
         self.des_y=y
         self.__init_Population()
     # 代价函数,代价函数设定为前后两个粒子之间的差值最小
+    # 由于一个粒子就是一条路径,于是代价函数设定为直接计算这条路径的代价
     def fit_func(self,x_line):
         ans=0
         for i in range(1,self.dim):
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     # 方格边长
     a=1 
     # 随机产生一张图
-    psodemo=Pso(30,10,50,10,10)
+    psodemo=Pso(30,10,30,30)
     grid=psodemo.grid
     # 画图
     plt.figure()
