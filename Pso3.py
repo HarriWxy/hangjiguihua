@@ -14,8 +14,8 @@ class Grid(object):
             self.grid.append(temp)
 # 粒子群种群
 class Pso(object):
-    # p_num:粒子数目,dim:维度,max_iter:最大迭代次数,x,y为目的地
-    def __init__(self,p_num,max_iter,x,y): 
+    # p_num:粒子数目,dim:地图的维度,max_iter:最大迭代次数,x,y为目的地
+    def __init__(self,p_num,dim,max_iter,x,y): 
         self.grid=Grid(dim).grid # 生成的网格图
         self.w = 0.8
         self.c1 = 2
@@ -23,15 +23,16 @@ class Pso(object):
         self.r1 = 0.6
         self.r2 = 0.3
         self.p_num = p_num  # 粒子数量
-        self.dim = 2*x+y  # 搜索维度,调参数,考虑用ai训练
+        self.dim = dim  
+        self.p_dim=2*dim # 这是粒子的维度,后期考虑用ai调参
         self.max_iter = max_iter  # 迭代次数
-        self.x = np.zeros((self.p_num, self.dim))  # 所有粒子的位置和速度
-        self.v = np.zeros((self.p_num, self.dim))
-        self.pbest = np.zeros((self.p_num, self.dim))  # 个体经历的最佳位置和全局最佳位置
-        self.gbest = np.zeros((1, self.dim))
+        self.x = np.zeros((self.p_num, self.p_dim))  # 所有粒子的位置和速度
+        self.v = np.zeros((self.p_num, self.p_dim))
+        self.pbest = np.zeros((self.p_num, self.p_dim))  # 个体经历的最佳位置和全局最佳位置
+        self.gbest = np.zeros((1, self.p_dim))
         self.p_fit = np.zeros(self.p_num)  # 每个个体的历史最佳适应值
         self.fit = 1e10  # 全局最佳适应值
-        self.run = 0 #已经走过的路程代价
+        self.run = 0 # 已经走过的路程代价
         self.des_x=x # 目的
         self.des_y=y
         self.__init_Population()
@@ -65,7 +66,7 @@ class Pso(object):
         for k in range(self.max_iter):
             for i in range(self.p_num):
                 temp=self.fit_func(self.x[i])
-                if temp < self.p_fit[i]: #更新个体最优
+                if temp < self.p_fit[i]: # 更新个体最优
                     self.p_fit[i] = temp
                     self.pbest[i] = self.x[i]
                     if self.p_fit[i] < self.fit:
@@ -82,8 +83,8 @@ class Pso(object):
     def trans(self):
         temp=0
         for i in range(self.dim): # 这里需要限制一下范围，但我不记得为什么
-            if (self.gbest[i]>9):
-                self.gbest[i]=9
+            if (self.gbest[i]>self.dim):
+                self.gbest[i]=self.dim
             if (self.gbest[i]<0):
                 self.gbest[i]=0
             grid[i][int(self.gbest[i])]=50
@@ -95,7 +96,7 @@ if __name__ == "__main__":
     # 方格边长
     a=1 
     # 随机产生一张图
-    psodemo=Pso(30,10,30,30)
+    psodemo=Pso(30,10,30,29,29)
     grid=psodemo.grid
     # 画图
     plt.figure()
