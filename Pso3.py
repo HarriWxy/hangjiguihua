@@ -9,13 +9,14 @@ class Grid(object):
         for i in range(dim):
             temp=[]
             for j in range(dim):
-                temp.append(random.randint(0,1))
+                temp.append(100*random.randint(0,1))
                 # 0 1矩阵,1代表障碍
             self.grid.append(temp)
 # 粒子群种群
 class Pso(object):
     # p_num:粒子数目,dim:地图的维度,max_iter:最大迭代次数,x,y为目的地
     def __init__(self,p_num,dim,max_iter,x,y): 
+        self.a=1 #每一段的最小距离
         self.grid=Grid(dim).grid # 生成的网格图
         self.w = 0.8
         self.c1 = 2
@@ -36,7 +37,9 @@ class Pso(object):
         self.des_x=x # 目的
         self.des_y=y
         self.__init_Population()
-    # 代价函数,代价函数设定为前后两个粒子之间的差值最小
+
+    # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
+    # 加上这条直线是否会穿过障碍计算这两个点之间的矩形范围内的障碍之和
     # 由于一个粒子就是一条路径,于是代价函数设定为直接计算这条路径的代价
     def fit_func(self,x_line):
         ans=0
@@ -82,7 +85,7 @@ class Pso(object):
     # 标注图像中的路径
     def trans(self):
         temp=0
-        for i in range(self.dim): # 这里需要限制一下范围，但我不记得为什么
+        for i in range(self.dim): # 这里需要限制一下范围
             if (self.gbest[i]>self.dim):
                 self.gbest[i]=self.dim
             if (self.gbest[i]<0):
@@ -91,6 +94,10 @@ class Pso(object):
             for j in range(min(temp,int(self.gbest[i])),max(temp,int(self.gbest[i]))):
                 grid[i][j]=30
             temp=int(self.gbest[i])
+    # def drawLine():
+        # 画出无人机路径图,直线连接
+        
+
 
 if __name__ == "__main__":
     # 方格边长
