@@ -29,8 +29,8 @@ class Pso(object):
         self.k=1
         self.p_dim=self.k*dim # 这是粒子的维度,后期考虑用ai调参
         self.max_iter = max_iter  # 迭代次数
-        self.x = np.zeros((self.p_num, 2*self.p_dim))  # 所有粒子的位置和速度
-        self.v = np.zeros((self.p_num, 2*self.p_dim))
+        self.x = np.zeros((self.p_num, 2*self.p_dim))  # 所有粒子的位置和角度
+        self.theta = np.zeros((self.p_num, 2*self.p_dim))
         self.pbest = np.zeros((self.p_num, 2*self.p_dim))  # 个体经历的最佳位置和全局最佳位置
         self.gbest = np.zeros((1, 2*self.p_dim))
         self.p_fit = np.zeros(self.p_num)  # 每个个体的历史最佳适应值
@@ -39,7 +39,10 @@ class Pso(object):
         self.des_x=x # 目的
         self.des_y=y
         self.__init_Population()
-
+    def fThetatoX(self):
+        for i in range(self.p_num):
+            for j in range(2*self.p_dim):
+                self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2 
     # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
     # 加上这条直线是否会穿过障碍计算这两个点之间的矩形范围内的障碍之和
     # 由于一个粒子就是一条路径,于是代价函数设定为直接计算这条路径的代价
@@ -56,16 +59,15 @@ class Pso(object):
     # 初始化种群
     def __init_Population(self):
         for i in range(self.p_num):
-            for j in range(1,self.dim-1):
-                self.x[i][j]=random.randint(0,self.dim)
-                self.v[i][j]=random.randint(-1,1)
-            self.x[i][self.dim-1] = (self.dim-1)
-            self.pbest[i]=self.x[i]
+            for j in range(2*self.p_num):
+                self.theta[i][j]=random.uniform(-np.pi/2,np.pi/2)
+                self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
+            self.pbest[i]=self.theta[i]
             temp=self.fit_func(self.x[i])
             self.p_fit[i]=temp
             if temp < self.fit:
                 self.fit=temp
-                self.gbest=self.x[i]
+                self.gbest=self.theta[i]
     
     # 迭代函数
     def iter(self):
@@ -75,14 +77,15 @@ class Pso(object):
                 temp=self.fit_func(self.x[i])
                 if temp < self.p_fit[i]: # 更新个体最优
                     self.p_fit[i] = temp
-                    self.pbest[i] = self.x[i]
+                    self.pbest[i] = self.theta[i]
                     if self.p_fit[i] < self.fit:
-                        self.gbest=self.x[i]
+                        self.gbest=self.theta[i]
                         self.fit=self.p_fit[i]
             for i in range(self.p_num):
-                self.v[i]=self.w*self.v[i]+self.c1*self.r1*(self.pbest[i]-self.x[i])+\
-                            self.c2*self.r2*(self.gbest-self.x[i])
-                self.x[i]=self.x[i]+self.v[i]
+                for j in range(2*self.p_dim):
+                    u = random.uniform(0,1)
+                    gamma = u*self.pbest[i][j] + (1-u)*self.gbest[i][j]
+                    
             fitness.append(self.fit)
         # self.trans()
         return fitness
