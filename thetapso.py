@@ -39,6 +39,7 @@ class Pso(object):
         self.des_x=x # 目的
         self.des_y=y
         self.__init_Population()
+
     def fThetatoX(self):
         for i in range(self.p_num):
             for j in range(2*self.p_dim):
@@ -49,17 +50,19 @@ class Pso(object):
     def calObs(self, x1, y1, x2, y2):
         # 使用ida*算法计算这个矩形中最少的路径开销
         temp=0
+
     def fit_func(self,x_line):
-        len_Of_Rute = np.sqrt(x_line[0]**2 + x_line[self.p_num]**2)
+        len_Of_Rute = np.sqrt(x_line[0]**2 + x_line[self.p_dim]**2)
         for i in range(1,self.p_dim):
             len_Of_Rute += np.sqrt( (x_line[i]-x_line[i-1])**2 + (x_line[i]-x_line[i-1])**2 )
-        len_Of_Rute+=np.sqrt( (self.des_x-x_line[self.p_num-1])**2 + (self.des_y-x_line[2*self.p_num-1]) )
+        len_Of_Rute+=np.sqrt( (self.des_x-x_line[self.p_dim-1])**2 + (self.des_y-x_line[2*self.p_dim-1]) )
         the_of_rute = 0
-        return  0
+        return  len_Of_Rute+the_of_rute
+
     # 初始化种群
     def __init_Population(self):
         for i in range(self.p_num):
-            for j in range(2*self.p_num):
+            for j in range(2*self.p_dim):
                 self.theta[i][j]=random.uniform(-np.pi/2,np.pi/2)
                 self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
             self.pbest[i]=self.theta[i]
@@ -83,19 +86,19 @@ class Pso(object):
                     if self.p_fit[i] < self.fit:
                         self.gbest=self.theta[i]
                         self.fit=self.p_fit[i]
+
+            gamma=np.zeros_like(self.theta)
+
             for i in range(self.p_num):
                 u = random.uniform(0,1)
-
-                # 需要看一下这里应该怎么更新
-                gamma = u*self.pbest[i] + (1-u)*self.gbest[i]
-
+                gamma[i] = u*self.pbest[i] + (1-u)*self.gbest
 
             for i in range(self.p_num):
                 # mutation
                 li=list(range(self.p_num))
                 li.remove(i)
                 r = random.sample(li,3) # 随机选择的三个系数作为突变来源的选择
-                v = gamma[r[1]] + F*(gamma[r[2]] - gamma[r[3]]) # F是突变的系数
+                v = gamma[r[0]] + F*(gamma[r[1]] - gamma[r[2]]) # F是突变的系数
                 li=list(range(2*self.p_dim))
                 rnbr=random.sample(li,random.randint(1,self.p_dim))
                 for j in range(2*self.p_dim):
@@ -108,6 +111,7 @@ class Pso(object):
             fitness.append(self.fit)
         # self.trans()
         return fitness
+
     # 标注图像中的路径
     def trans(self):
         temp=0
