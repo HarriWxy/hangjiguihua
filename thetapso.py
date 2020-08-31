@@ -12,8 +12,9 @@ class Grid(object):
                 temp.append(100*random.randint(0,1))
                 # 0 1矩阵,1代表障碍
             self.grid.append(temp)
-# 粒子群种群
+
 class Pso(object):
+    # 粒子群种群
     # p_num:粒子数目,允许有相同的粒子出现
     # dim:地图的维度,max_iter:最大迭代次数,x,y为目的地
     def __init__(self,p_num,dim,max_iter,x,y): 
@@ -41,17 +42,24 @@ class Pso(object):
         self.__init_Population()
 
     def fThetatoX(self):
+        # theta To x
         for i in range(self.p_num):
             for j in range(2*self.p_dim):
-                self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2 
-    # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
-    # 加上这条直线是否会穿过障碍计算这两个点之间的矩形范围内的障碍之和
-    # 由于一个粒子就是一条路径,于是代价函数设定为直接计算这条路径的代价
+                self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
+     
+    def dfs(self,x1,y1,x2,y2):
+        if (x1>)
+        elif (x1==x2) & (y1==y2):
+            return True
+        
     def calObs(self, x1, y1, x2, y2):
         # 使用ida*算法计算这个矩形中最少的路径开销
         temp=0
 
     def fit_func(self,x_line):
+        # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
+        # 加上这条直线是否会穿过障碍计算这两个点之间的矩形范围内的障碍之和
+        # 由于一个粒子就是一条路径,于是代价函数设定为直接计算这条路径的代价
         len_Of_Rute = np.sqrt(x_line[0]**2 + x_line[self.p_dim]**2)
         for i in range(1,self.p_dim):
             len_Of_Rute += np.sqrt( (x_line[i]-x_line[i-1])**2 + (x_line[i]-x_line[i-1])**2 )
@@ -59,8 +67,8 @@ class Pso(object):
         the_of_rute = 0
         return  len_Of_Rute+the_of_rute
 
-    # 初始化种群
     def __init_Population(self):
+        # 初始化种群
         for i in range(self.p_num):
             for j in range(2*self.p_dim):
                 self.theta[i][j]=random.uniform(-np.pi/2,np.pi/2)
@@ -72,8 +80,8 @@ class Pso(object):
                 self.fit=temp
                 self.gbest=self.theta[i]
     
-    # 迭代函数
     def iter(self):
+        # 迭代函数
         F=1
         CR=0.5 # 选择变异的系数
         fitness=[]
@@ -112,8 +120,8 @@ class Pso(object):
         # self.trans()
         return fitness
 
-    # 标注图像中的路径
-    def trans(self):
+    def trans(self):  
+        # 标注图像中的路径
         temp=0
         for i in range(self.dim): # 这里需要限制一下范围
             if (self.gbest[i]>self.dim):
@@ -124,6 +132,7 @@ class Pso(object):
             for j in range(min(temp,int(self.gbest[i])),max(temp,int(self.gbest[i]))):
                 grid[i][j]=30
             temp=int(self.gbest[i])
+
     # def drawLine():
         # 画出无人机路径图,直线连接
         
