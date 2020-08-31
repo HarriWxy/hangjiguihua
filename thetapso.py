@@ -71,6 +71,8 @@ class Pso(object):
     
     # 迭代函数
     def iter(self):
+        F=1
+        CR=0.5 # 选择变异的系数
         fitness=[]
         for k in range(self.max_iter):
             for i in range(self.p_num):
@@ -82,9 +84,26 @@ class Pso(object):
                         self.gbest=self.theta[i]
                         self.fit=self.p_fit[i]
             for i in range(self.p_num):
+                u = random.uniform(0,1)
+
+                # 需要看一下这里应该怎么更新
+                gamma = u*self.pbest[i] + (1-u)*self.gbest[i]
+
+
+            for i in range(self.p_num):
+                # mutation
+                li=list(range(self.p_num))
+                li.remove(i)
+                r = random.sample(li,3) # 随机选择的三个系数作为突变来源的选择
+                v = gamma[r[1]] + F*(gamma[r[2]] - gamma[r[3]]) # F是突变的系数
+                li=list(range(2*self.p_dim))
+                rnbr=random.sample(li,random.randint(1,self.p_dim))
                 for j in range(2*self.p_dim):
-                    u = random.uniform(0,1)
-                    gamma = u*self.pbest[i][j] + (1-u)*self.gbest[i][j]
+                    # crossover
+                    if (random.random()<CR) or (j in rnbr):
+                        self.theta[i][j] = v[j]
+                    else:
+                        self.theta[i][j]  = gamma[i][j]
                     
             fitness.append(self.fit)
         # self.trans()
