@@ -23,7 +23,7 @@ class Dstar(object):
             su+=self.g[x][j]
         return su
     def calkey(self,x,y):
-        return[self.rhs[x,y]+self.calh(x,y)+km,rhs[x,y],[x,y]]
+        return[self.rhs[x,y]+self.calh(x,y)+self.km,self.rhs[x,y],[x,y]]
     def __init__(self,xstart,ystart,xgoal,ygoal,g):
         self.km=0 # 当地图变化时随之变化的参数
         self.xstart=xstart
@@ -75,7 +75,7 @@ class Pso(object):
         
     def calObs(self, x1, y1, x2, y2):
         # 使用ida*算法计算这个矩形中最少的路径开销
-        dstar=Dstar(x1,y1,x2,y2,self.grid[x1:x2,y1:y2])
+        dstar=Dstar(x1,y1,x2,y2,self.grid)
 
     def fit_func(self,x_line):
         # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和

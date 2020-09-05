@@ -48,9 +48,10 @@ class Pso(object):
                 self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
      
     def dfs(self,x1,y1,x2,y2):
-        if (x1>)
-        elif (x1==x2) & (y1==y2):
-            return True
+        # if (x1>)
+        # elif (x1==x2) & (y1==y2):
+        #     return True
+        return True
         
     def calObs(self, x1, y1, x2, y2):
         # 使用ida*算法计算这个矩形中最少的路径开销
