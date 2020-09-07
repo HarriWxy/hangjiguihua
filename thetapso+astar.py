@@ -4,25 +4,64 @@ import random
 import matplotlib.pyplot as plt 
 from queue import PriorityQueue
 
-class Grid(object):
-    # 产生一个格子地图类
-    grid=[]
-    def __init__(self,dim):
-        for i in range(dim):
-            temp=[]
-            for j in range(dim):
-                temp.append(10*random.random)
-                # 0 1矩阵,1代表障碍
-            self.grid.append(temp)
-
-
-
-
 class Pso(object):
-    # 粒子群种群
-    # p_num:粒子数目,允许有相同的粒子出现
-    # dim:地图的维度,max_iter:最大迭代次数,x,y为目的地
+    # 粒子群算法类
+    class Grid(object):
+        # 产生一个格子地图类
+        grid=[]
+        def __init__(self,dim):
+            for i in range(dim):
+                temp=[]
+                for j in range(dim):
+                    temp.append(10*random.random)
+                    # 0 1矩阵,1代表障碍
+                self.grid.append(temp)
+
+    class Astar(object):
+        # A*算法类
+        def calH(self,x,y):
+            # 计算启发函数估计值
+            su=0 
+            for i in range(x+1,self.grid.shape[0]+1):
+                su+=self.grid[i][0] * self.w2 # 障碍系数
+                su+=1 * self.w1 # 路径长度系数
+            for j in range(y+1,self.grid.shape[1]+1):
+                su+=self.grid[j][j] * self.w2
+                su+=1 * self.w1
+            return su
+
+        def calKey(self,x1,x2,y1,y2):
+            
+            return [g[x1][x2]+self.calH(x1,x2)]
+
+        def __init__(self,grid,x_line):
+            super().__init__()
+            self.grid=np.array(grid)
+            self.g=np.zeros_like(self.grid)
+            self.w1=0.3 # 路径长度系数
+            self.w2=0.7 # 障碍系数
+            self.u=PriorityQueue()
+            self.g[0][0]=0
+            self.u.put(self.calKey(0,0))
+            self.Bfs(x_line)
+            
+        def Bfs(self,x_line):
+
+            while ~self.u.empty:
+                pass
+            return True
+            
+        def calObs(self, x1, y1, x2, y2):
+            # 使用a*算法计算这个矩形中最少的路径开销
+            
+            u=PriorityQueue()
+            temp=0
+            return temp
+
+
     def __init__(self,p_num,dim,max_iter,x,y): 
+        # p_num:粒子数目,允许有相同的粒子出现
+        # dim:地图的维度,max_iter:最大迭代次数,x,y为目的地
         self.a=1 #每一段的最小距离
         self.grid=Grid(dim).grid # 生成的网格图
         self.w = 0.8
@@ -54,21 +93,7 @@ class Pso(object):
                 if (self.x[i][j]>=self.dim):
                     self.x[i][j]=self.dim-1
                 elif (self.x[i][j]<0):
-                    self.x[i][j]=0
-     
-    def dfs(self,x1,y1,x2,y2):
-        # if (x1>)
-        # elif (x1==x2) & (y1==y2):
-        #     return True
-        return True
-        
-    def calObs(self, x1, y1, x2, y2):
-        # 使用a*算法计算这个矩形中最少的路径开销
-        w1=0.3 # 路径长度系数
-        w2=0.7 # 障碍系数
-        u=PriorityQueue()
-        temp=0
-        return temp
+                    self.x[i][j]=0   
 
     def fit_func(self,x_line):
         # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
