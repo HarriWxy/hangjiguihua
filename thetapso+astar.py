@@ -19,22 +19,19 @@ class Pso(object):
 
     class Astar(object):
         # A*算法类
+        dx=[1,-1,0,0]
+        dy=[0,0,1,-1]
         def calH(self,x,y):
             # 计算启发函数估计值
-            su=0 
-            for i in range(x+1,self.grid.shape[0]+1):
-                su+=self.grid[i][0] * self.w2 # 障碍系数
-                su+=1 * self.w1 # 路径长度系数
-            for j in range(y+1,self.grid.shape[1]+1):
-                su+=self.grid[j][j] * self.w2
-                su+=1 * self.w1
+            s=np.shape(self.grid)
+            su=7.5 * (s[0]-x+s[1]-y) #7.5倍的两边之长
             return su
 
-        def calKey(self,x1,x2,y1,y2):
-            
-            return [g[x1][x2]+self.calH(x1,x2)]
+        def calKey(self,x1,y1):
+            # 返回该点的节点值
+            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1]]
 
-        def __init__(self,grid,x_line):
+        def __init__(self,grid,x_line,p_dim):
             super().__init__()
             self.grid=np.array(grid)
             self.g=np.zeros_like(self.grid)
@@ -43,14 +40,43 @@ class Pso(object):
             self.u=PriorityQueue()
             self.g[0][0]=0
             self.u.put(self.calKey(0,0))
-            self.Bfs(x_line)
+            self.Bfs(x_line,p_dim)
             
-        def Bfs(self,x_line):
+        def Bfs(self,x_line,p_dim):
+            # 想法是用A*的算法思想连接PSO搜索出的路径节点
+            x_left=0
+            y_left=0
+            for i in range(p_dim):
+                # 划分搜索区域:
+                # 前一个粒子到下一个粒子之间的区域
+                x_des=x_line[i]
+                y_des=x_line[p_dim+i]
+                if x_des >= x_left:
+                    x_right = x_des
+                elif x_des < x_left:
+                    x_right = x_left
+                    x_left = x_des 
+                if y_des >= y_left:
+                    y_right = y_des
+                elif y_des < y_left:
+                    y_left = y_right
+                    y_right = y_des
+                visited=np.zeros([x_right-x_left+1,y_right-y_left+1]) # 访问过的点
+                # BFS
+                while self.u.empty == False:
+                    s=self.u.get()
+                    if s[2][0]==x_des and s[2][1]==y_des:
+                        break
+                    for k in range(4):
+                        newS_x=s[2][0]+self.dx[k]
+                        newS_y=s[2][1]+self.dy[k]
+                        if newS_x < x_left or newS_x > x_right or \
+                            newS_y < y_left or newS_y > y_right:
+                            break
+                        elif visited[newS_x][newS_y]==1:
+                            break
 
-            while ~self.u.empty:
-                pass
-            return True
-            
+                        
         def calObs(self, x1, y1, x2, y2):
             # 使用a*算法计算这个矩形中最少的路径开销
             
@@ -63,7 +89,7 @@ class Pso(object):
         # p_num:粒子数目,允许有相同的粒子出现
         # dim:地图的维度,max_iter:最大迭代次数,x,y为目的地
         self.a=1 #每一段的最小距离
-        self.grid=Grid(dim).grid # 生成的网格图
+        self.grid=self.Grid(dim).grid # 生成的网格图
         self.w = 0.8
         self.c1 = 2
         self.c2 = 2
@@ -100,7 +126,7 @@ class Pso(object):
         # 加上这条直线是否会穿过障碍计算这两个点之间的矩形范围内的障碍之和
         # 由于一个粒子就是一条路径,于是代价函数设定为直接计算这条路径的代价
         len_Of_Rute = np.sqrt(x_line[0]**2 + x_line[self.p_dim]**2) # 这个或许可以不用
-        the_of_rute = self.calObs(0,x_line[0],0,x_line[self.p_dim])
+        the_of_rute = 0#self.calObs(0,x_line[0],0,x_line[self.p_dim])
         for i in range(1,self.p_dim):
             len_Of_Rute += np.sqrt( (x_line[i]-x_line[i-1])**2 + (x_line[i]-x_line[i-1])**2 )
         len_Of_Rute+=np.sqrt( (self.des_x-x_line[self.p_dim-1])**2 + (self.des_y-x_line[2*self.p_dim-1])**2 )
