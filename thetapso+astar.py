@@ -27,9 +27,9 @@ class Pso(object):
             su=7.5 * (s[0]-x+s[1]-y) #7.5倍的两边之长
             return su
 
-        def calKey(self,x1,y1):
+        def calKey(self,x1,y1,route):
             # 返回该点的节点值
-            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1]]
+            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1],route.append([x1,y1])]
 
         def __init__(self,grid,x_line,p_dim):
             super().__init__()
@@ -39,7 +39,8 @@ class Pso(object):
             self.w2=0.7 # 障碍系数
             self.u=PriorityQueue()
             self.g[0][0]=0
-            self.u.put(self.calKey(0,0))
+            route=[]
+            self.u.put(self.calKey(0,0,route))
             self.Bfs(x_line,p_dim)
             
         def Bfs(self,x_line,p_dim):
@@ -65,6 +66,7 @@ class Pso(object):
                 # BFS
                 while self.u.empty == False:
                     s=self.u.get()
+                    visited[s[2][0]-x_left][s[2][1]-x_right]=1
                     if s[2][0]==x_des and s[2][1]==y_des:
                         break
                     for k in range(4):
@@ -75,7 +77,8 @@ class Pso(object):
                             break
                         elif visited[newS_x][newS_y]==1:
                             break
-
+                        visited[newS_x-x_left][newS_y-y_left]=1
+                        self.u.put(self.calKey(newS_x,newS_y,s[2]))
                         
         def calObs(self, x1, y1, x2, y2):
             # 使用a*算法计算这个矩形中最少的路径开销
