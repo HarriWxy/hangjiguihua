@@ -31,7 +31,7 @@ class Pso(object):
             # 返回该点的节点值
             return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1],route.append([x1,y1])]
 
-        def __init__(self,grid,x_line,p_dim):
+        def __init__(self,grid,x_line,p_dim,x,y):
             super().__init__()
             self.grid=np.array(grid)
             self.g=np.zeros_like(self.grid)
@@ -41,17 +41,20 @@ class Pso(object):
             self.g[0][0]=0
             route=[]
             self.u.put(self.calKey(0,0,route))
-            self.Bfs(x_line,p_dim)
-            
-        def Bfs(self,x_line,p_dim):
-            # 想法是用A*的算法思想连接PSO搜索出的路径节点
+            self.getBlock(x_line,p_dim,x,y)
+
+        def getBlock(self,x_line,p_dim,x,y):
             x_left=0
             y_left=0
-            for i in range(p_dim):
+            for i in range(p_dim+1):
                 # 划分搜索区域:
                 # 前一个粒子到下一个粒子之间的区域
-                x_des=x_line[i]
-                y_des=x_line[p_dim+i]
+                if i !=p_dim:
+                    x_des=x_line[i]
+                    y_des=x_line[p_dim+i]
+                else:
+                    x_des=x
+                    y_des=y
                 if x_des >= x_left:
                     x_right = x_des
                 elif x_des < x_left:
@@ -62,30 +65,32 @@ class Pso(object):
                 elif y_des < y_left:
                     y_left = y_right
                     y_right = y_des
-                visited=np.zeros([x_right-x_left+1,y_right-y_left+1]) # 访问过的点
-                # BFS
-                while self.u.empty == False:
-                    s=self.u.get()
-                    visited[s[2][0]-x_left][s[2][1]-x_right]=1
-                    if s[2][0]==x_des and s[2][1]==y_des:
-                        break
-                    for k in range(4):
-                        newS_x=s[2][0]+self.dx[k]
-                        newS_y=s[2][1]+self.dy[k]
-                        if newS_x < x_left or newS_x > x_right or \
-                            newS_y < y_left or newS_y > y_right:
-                            break
-                        elif visited[newS_x][newS_y]==1:
-                            break
-                        visited[newS_x-x_left][newS_y-y_left]=1
-                        self.u.put(self.calKey(newS_x,newS_y,s[2]))
-                        
-        def calObs(self, x1, y1, x2, y2):
-            # 使用a*算法计算这个矩形中最少的路径开销
+                self.Bfs(x_des,y_des,x_left,y_left,x_right,y_right)
+                x_left=x_des
+                y_left=y_des
             
-            u=PriorityQueue()
-            temp=0
-            return temp
+
+        def Bfs(self,x_des,y_des,x_left,y_left,x_right,y_right):
+            # 想法是用A*的算法思想连接PSO搜索出的路径节点
+            visited=np.zeros([x_right-x_left+1,y_right-y_left+1]) # 访问过的点
+            # BFS
+            while self.u.empty == False:
+                s=self.u.get()
+                visited[s[2][0]-x_left][s[2][1]-x_right]=1
+                if s[2][0]==x_des and s[2][1]==y_des:
+                    self.u._init()
+                    self.u.put(s)
+                    break
+                for k in range(4):
+                    newS_x=s[2][0]+self.dx[k]
+                    newS_y=s[2][1]+self.dy[k]
+                    if newS_x < x_left or newS_x > x_right or \
+                        newS_y < y_left or newS_y > y_right:
+                        break
+                    elif visited[newS_x][newS_y]==1:
+                        break
+                    visited[newS_x-x_left][newS_y-y_left]=1
+                    self.u.put(self.calKey(newS_x,newS_y,s[2]))
 
 
     def __init__(self,p_num,dim,max_iter,x,y): 
