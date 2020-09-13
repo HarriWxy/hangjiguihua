@@ -3,18 +3,17 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt 
 from queue import PriorityQueue
-
+# 暂存一个比较完整的文件
 class Pso(object):
     # 粒子群算法类
     class Grid(object):
         # 产生一个格子地图类
         def __init__(self,dim):
             self.grid=np.zeros([dim,dim])
-            for i in range(dim-1):
-                for j in range(dim-1):
+            for i in range(1,dim):
+                for j in range(1,dim):
                     if random.random() < 0.3: # 有0.3倍的概率生成一个障碍
                         self.grid[i][j]=1
-            self.grid[0][0]=0
                     # 0 1矩阵,1代表障碍
 
     class Astar(object):
@@ -106,7 +105,7 @@ class Pso(object):
         self.grid=self.Grid(dim+1).grid # 生成的网格图
         self.p_num = p_num  # 粒子数量
         self.dim = dim  
-        self.p_dim= 2 *dim # 这是粒子的维度,后期考虑用ai调参
+        self.p_dim= 1 *dim # 这是粒子的维度,后期考虑用ai调参
         self.max_iter = max_iter  # 迭代次数
         self.x = np.zeros((self.p_num, 2*self.p_dim))  # 所有粒子的位置和角度
         self.theta = np.zeros((self.p_num, 2*self.p_dim))
@@ -126,18 +125,9 @@ class Pso(object):
             for j in range(2*self.p_dim):
                 self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
                 if (self.x[i][j]>=self.dim):
-                    self.x[i][j]=self.dim-1
+                    self.x[i][j]=self.dim
                 elif (self.x[i][j]<0):
                     self.x[i][j]=0   
-    def fThetatoXmax(self):
-        x=np.zeros_like(self.gbest)
-        for j in range(2*self.p_dim):
-            x[j] = self.dim * (np.sin(self.gbest[j]) + 1)/2
-            if x[j]>=self.dim:
-                x[j]=self.dim-1
-            elif x[j]<0:
-               x[j]=0
-        return x  
 
     def fit_func(self,x_line):
         # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
@@ -224,7 +214,7 @@ class Pso(object):
             for i in range(self.p_num):
                 temp=self.fit_simple_func(self.x[i])
                 if temp < self.p_fit[i]: # 更新个体最优
-                    self.p_fit[i] = temp #self.fit_func(self.x[i])
+                    self.p_fit[i] = self.fit_func(self.x[i])
                     self.pbest[i] = self.theta[i]
                     if self.p_fit[i] < self.fit:
                         self.gbest=self.theta[i]
@@ -233,11 +223,11 @@ class Pso(object):
 
         return fitness
 
-    def trans(self,x):  
+    def trans(self):  
         # 标注图像中的路径
         temp=0
-        for i in range(self.p_dim): # 这里需要限制一下范围
-            self.grid[int(x[i])][int(x[self.p_dim+i])]=5
+        for i in range(self.dim): # 这里需要限制一下范围
+            self.grid[int(self.gbest[i])][int(self.gbest[self.p_dim+i])]=5
             
 
     def drawLine(self):
@@ -248,26 +238,24 @@ class Pso(object):
         fitness=np.array(self.iter())
         print(fitness)
         plt.subplot(1,2,1)
-        for i in range(self.dim+1):
-            for j in range(self.dim+1):
+        for i in range(self.dim):
+            for j in range(self.dim):
                 if self.grid[i][j] > 0:
                     plt.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='k',alpha=0.2)
                 else :
                     plt.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='grey',alpha=1)
-        x=[0]
-        y=[0]
-        xxx=self.fThetatoXmax()
-        self.fit_func(xxx)
+        x=[]
+        y=[]
         # for i in range(self.p_dim):
-        #     x.append(xxx[self.p_dim+i])
-        #     y.append(self.dim-xxx[i])
+        #     x.append(self.gbest[i])
+        #     y.append(self.gbest[self.p_dim+i])
         route=self.star[2]
         for i in route:
-            x.append(self.dim-i[1])
-            y.append(i[0])
+            x.append(i[0])
+            y.append(i[1])
         plt.plot(x,y)
         plt.subplot(1,2,2)
-        self.trans(xxx)
+        self.trans()
         plt.imshow(np.array(self.grid))
         # plt.plot(fitness)
         plt.show()
@@ -275,5 +263,5 @@ class Pso(object):
 
 if __name__ == "__main__":
     # 随机产生一张图
-    psodemo=Pso(4,30,500,29,29)
+    psodemo=Pso(4,30,20,29,29)
     psodemo.drawLine()
