@@ -164,10 +164,11 @@ class Pso(object):
                 y_step=1
             else:
                 y_step=-1
+            length=0
             for x in range(x_left,x_des+x_step,x_step):
-                length = 0.3 + 0.7 * self.grid[x][y_left]
+                length += 1 + 7 * self.grid[x][y_left]
             for y in range(y_left,y_des+y_step,y_step):
-                length += 0.3 + 0.7 * self.grid[x_des][y]
+                length += 1 + 7 * self.grid[x_des][y]
         return length
 
     def __init_Population(self):
@@ -275,5 +276,5 @@ class Pso(object):
 
 if __name__ == "__main__":
     # 随机产生一张图
-    psodemo=Pso(4,30,500,29,29)
+    psodemo=Pso(4,30,20,29,29)
     psodemo.drawLine()
