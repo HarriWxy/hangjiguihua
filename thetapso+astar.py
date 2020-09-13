@@ -29,8 +29,9 @@ class Pso(object):
 
         def calKey(self,x1,y1,route):
             # 返回该点的节点值
-            route.append([x1,y1])
-            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1],route]
+            r=route[:]
+            r.append([x1,y1])
+            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1],r]
 
         def __init__(self,grid,x_line,p_dim,x_des,y_des):
             # x_des,y_des是目标位置
