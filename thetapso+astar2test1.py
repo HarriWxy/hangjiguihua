@@ -3,18 +3,17 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt 
 from queue import PriorityQueue
-
+# 函数代价demo
 class Pso(object):
     # 粒子群算法类
     class Grid(object):
         # 产生一个格子地图类
         def __init__(self,dim):
             self.grid=np.zeros([dim,dim])
-            for i in range(dim-1):
-                for j in range(dim-1):
+            for i in range(1,dim):
+                for j in range(1,dim):
                     if random.random() < 0.3: # 有0.3倍的概率生成一个障碍
                         self.grid[i][j]=1
-            self.grid[0][0]=0
                     # 0 1矩阵,1代表障碍
 
     class Astar(object):
@@ -29,9 +28,8 @@ class Pso(object):
 
         def calKey(self,x1,y1,route):
             # 返回该点的节点值
-            r=route[:]
-            r.append([x1,y1])
-            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1],r]
+            route.append([x1,y1])
+            return [self.g[x1][y1]+self.calH(x1,y1),[x1,y1],route]
 
         def __init__(self,grid,x_line,p_dim,x_des,y_des):
             # x_des,y_des是目标位置
@@ -107,11 +105,11 @@ class Pso(object):
         self.grid=self.Grid(dim+1).grid # 生成的网格图
         self.p_num = p_num  # 粒子数量
         self.dim = dim  
-        self.p_dim= 2 *dim # 这是粒子的维度,后期考虑用ai调参
+        self.p_dim= 1 *dim # 这是粒子的维度,后期考虑用ai调参
         self.max_iter = max_iter  # 迭代次数
-        self.x = np.zeros((self.p_num, 2*self.p_dim))  # 所有粒子的位置和角度
-        self.theta = np.zeros((self.p_num, 2*self.p_dim))
-        self.pbest = np.zeros((self.p_num, 2*self.p_dim))  # 个体经历的最佳位置和全局最佳位置
+        self.x = np.zeros((self.p_num, 1))  # 所有粒子的位置和角度
+        self.theta = np.zeros((self.p_num, 1))
+        self.pbest = np.zeros((self.p_num, 1))  # 个体经历的最佳位置和全局最佳位置
         self.gbest = np.zeros((1, 2*self.p_dim))
         self.p_fit = np.zeros(self.p_num)  # 每个个体的历史最佳适应值
         self.fit = 1e10  # 全局最佳适应值
@@ -123,22 +121,14 @@ class Pso(object):
 
     def fThetatoX(self):
         # theta To x
-        for i in range(self.p_num):
-            for j in range(2*self.p_dim):
-                self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
-                if (self.x[i][j]>=self.dim):
-                    self.x[i][j]=self.dim-1
-                elif (self.x[i][j]<0):
-                    self.x[i][j]=0   
-    def fThetatoXmax(self):
-        x=np.zeros_like(self.gbest)
-        for j in range(2*self.p_dim):
-            x[j] = self.dim * (np.sin(self.gbest[j]) + 1)/2
-            if x[j]>=self.dim:
-                x[j]=self.dim-1
-            elif x[j]<0:
-               x[j]=0
-        return x  
+        self.x = self.theta
+        # for i in range(self.p_num):
+        #     for j in range(2*self.p_dim):
+        #         self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
+        #         if (self.x[i][j]>=self.dim):
+        #             self.x[i][j]=self.dim
+        #         elif (self.x[i][j]<0):
+        #             self.x[i][j]=0   
 
     def fit_func(self,x_line):
         # 代价函数,代价函数设定为距离之和,即两个粒子之间的距离之和
@@ -149,35 +139,34 @@ class Pso(object):
             self.star=star
         return  star[0]
 
-    def fit_simple_func(self,x_line):
+    def fit_simple_func(self,x):
         # 由于每次迭代用大量的粒子群搜索比较复杂,由此设计简单计算路径代价的方法
         # 先走横纵线再走横线
-        x_left=0
-        y_left=0
-        for i in range(self.p_dim):
-            x_des= int(x_line[i])
-            y_des= int(x_line[self.p_dim+i])
-            if x_des >= x_left:
-                x_step=1
-            else :
-                x_step=-1
-            if y_des >= y_left:
-                y_step=1
-            else:
-                y_step=-1
-            length=0
-            for x in range(x_left,x_des+x_step,x_step):
-                length += 1 + 7 * self.grid[x][y_left]
-            for y in range(y_left,y_des+y_step,y_step):
-                length += 1 + 7 * self.grid[x_des][y]
+        # x_left=0
+        # y_left=0
+        # for i in range(self.p_dim):
+        #     x_des= int(x_line[i])
+        #     y_des= int(x_line[self.p_dim+i])
+        #     if x_des >= x_left:
+        #         x_step=1
+        #     else :
+        #         x_step=-1
+        #     if y_des >= y_left:
+        #         y_step=1
+        #     else:
+        #         y_step=-1
+        #     for x in range(x_left,x_des+x_step,x_step):
+        #         length = 0.3 + 0.7 * self.grid[x][y_left]
+        #     for y in range(y_left,y_des+y_step,y_step):
+        #         length += 0.3 + 0.7 * self.grid[x_des][y]
+        length=(x-5)**2
         return length
 
     def __init_Population(self):
         # 初始化种群
         for i in range(self.p_num):
-            for j in range(2*self.p_dim):
-                self.theta[i][j]=random.uniform(-np.pi/2,np.pi/2)
-                self.x[i][j] = self.dim * (np.sin(self.theta[i][j]) + 1)/2
+            self.theta[i][0]=random.uniform(0,20)
+            self.x[i][0] = self.theta[i][0]
             self.pbest[i]=self.theta[i]
             temp=self.fit_simple_func(self.x[i])
             self.p_fit[i]=temp
@@ -191,16 +180,15 @@ class Pso(object):
         CR=0.5 # 选择变异的系数
         fitness=[]
         for k in range(self.max_iter):
-
             gamma=np.zeros_like(self.theta)
             for i in range(self.p_num):
                 u = random.uniform(0,1)
                 gamma[i] = u*self.pbest[i] + (1-u)*self.gbest
-                for j in range(2*self.p_dim):
-                    if gamma[i][j] > np.pi/2:
-                        gamma[i][j]=np.pi/2
-                    elif gamma[i][j] < -np.pi/2:
-                        gamma[i][j]= -np.pi/2
+                for j in range(1):
+                    if gamma[i][j] > 20:
+                        gamma[i][j]=20
+                    elif gamma[i][j] < 0:
+                        gamma[i][j]= 0
                 
             for i in range(self.p_num):
                 # mutation
@@ -210,7 +198,7 @@ class Pso(object):
                 v = gamma[r[0]] + F*(gamma[r[1]] - gamma[r[2]]) # F是突变的系数
                 li=list(range(2*self.p_dim))
                 rnbr=random.sample(li,random.randint(1,self.p_dim))
-                for j in range(2*self.p_dim):
+                for j in range(1):
                     # crossover
                     if (random.random()<CR) or (j in rnbr):
                         if v[j]>np.pi/2:
@@ -226,7 +214,7 @@ class Pso(object):
             for i in range(self.p_num):
                 temp=self.fit_simple_func(self.x[i])
                 if temp < self.p_fit[i]: # 更新个体最优
-                    self.p_fit[i] = temp #self.fit_func(self.x[i])
+                    self.p_fit[i] = temp
                     self.pbest[i] = self.theta[i]
                     if self.p_fit[i] < self.fit:
                         self.gbest=self.theta[i]
@@ -235,10 +223,10 @@ class Pso(object):
 
         return fitness
 
-    def trans(self,x):  
+    def trans(self):  
         # 标注图像中的路径
-        for i in range(self.p_dim): # 这里需要限制一下范围
-            self.grid[int(x[i])][int(x[self.p_dim+i])]=5
+        for i in range(self.dim): # 这里需要限制一下范围
+            self.grid[int(self.gbest[i])][int(self.gbest[self.p_dim+i])]=5
             
 
     def drawLine(self):
@@ -249,32 +237,33 @@ class Pso(object):
         fitness=np.array(self.iter())
         print(fitness)
         plt.subplot(1,2,1)
-        for i in range(self.dim+1):
-            for j in range(self.dim+1):
-                if self.grid[i][j] > 0:
-                    plt.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='k',alpha=0.2)
-                else :
-                    plt.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='grey',alpha=1)
-        x=[0]
-        y=[0]
-        xxx=self.fThetatoXmax()
-        self.fit_func(xxx)
+        # for i in range(self.dim):
+        #     for j in range(self.dim):
+        #         if self.grid[i][j] > 0:
+        #             plt.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='k',alpha=0.2)
+        #         else :
+        #             plt.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='grey',alpha=1)
+        x=np.linspace(0,20)
+        y=(x-5)**2
         # for i in range(self.p_dim):
-        #     x.append(xxx[self.p_dim+i])
-        #     y.append(self.dim-xxx[i])
-        route=self.star[2]
-        for i in route:
-            x.append(self.dim-i[1])
-            y.append(i[0])
+        #     x.append(self.gbest[i])
+        #     y.append(self.gbest[self.p_dim+i])
+        # route=self.star[2]
+        # for i in route:
+        #     x.append(i[0])
+        #     y.append(i[1])
         plt.plot(x,y)
-        plt.subplot(1,2,2)
-        self.trans(xxx)
-        plt.imshow(np.array(self.grid))
+        # plt.subplot(1,2,2)
+        # plt.plot(x,y)
+        # # y_x=self.x**
+        # plot()
+        # self.trans()
+        # plt.imshow(np.array(self.grid))
         # plt.plot(fitness)
         plt.show()
 
 
 if __name__ == "__main__":
     # 随机产生一张图
-    psodemo=Pso(4,30,20,29,29)
+    psodemo=Pso(20,30,20,29,29)
     psodemo.drawLine()
