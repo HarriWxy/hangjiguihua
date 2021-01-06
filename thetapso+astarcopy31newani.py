@@ -253,6 +253,7 @@ class Pso(object):
                         self.gbest=self.theta[i]
                         self.fit=temp
             self.fitness.append(self.fit)
+            return self.scats
 
     def trans(self,x):  
         # 标注图像中的路径
