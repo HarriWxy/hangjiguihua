@@ -284,8 +284,8 @@ def animate_init():
     scats.setdata([],[])
     return lins,scats
 def updateani(kk):
-    psodemo.iter()
-    scats.set_data(psodemo.x[0],psodemo.x[1])
+    # psodemo.iter()
+    scats.set_data([kk],[kk])
     x=[0.5]
     y=[psodemo.dim-0.5]
     # route=psodemo.star[2]
@@ -309,4 +309,5 @@ if __name__ == "__main__":
     #         else :
     #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
     ani=Animation.FuncAnimation(fig,updateani,range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
+    plt.show()
     
