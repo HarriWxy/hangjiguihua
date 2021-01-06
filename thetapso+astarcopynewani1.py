@@ -299,7 +299,7 @@ if __name__ == "__main__":
     # 随机产生一张图
     psodemo=Pso(50,30,50,29,29)
     fig = plt.figure()
-    ax = fig.add_subplot(111)
+    ax = fig.add_subplot(111,autoscale_on=False, xlim=(0, psodemo.dim), ylim=(0,psodemo.dim))
     lins, = ax.plot([],[], 'o-', lw=2)
     scats, =ax.plot([],[],"ro",color='r')
     for i in range(psodemo.dim+1):
