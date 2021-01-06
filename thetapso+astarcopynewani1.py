@@ -277,7 +277,6 @@ class Pso(object):
         fitness=np.array(self.fitness)
         print(fitness)
 
-        plt.show()
 
 def animate_init():
     lins.setdata([],[])
@@ -285,7 +284,11 @@ def animate_init():
     return lins,scats
 def updateani(kk):
     psodemo.iter()
-    scats.set_data(psodemo.x[0],psodemo.x[1])
+    x=psodemo.x[0]
+    x=x.tolist()
+    y=psodemo.x[1]
+    y=y.tolist()
+    scats.set_data(x,y)
     x=[0.5]
     y=[psodemo.dim-0.5]
     # route=psodemo.star[2]
@@ -308,5 +311,6 @@ if __name__ == "__main__":
     #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
     #         else :
     #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
+    updateani(1)
     ani=Animation.FuncAnimation(fig,updateani,range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
-    
+    plt.show()
