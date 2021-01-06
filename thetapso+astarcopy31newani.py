@@ -125,8 +125,8 @@ class Pso(object):
         self.des_x=x # 目的
         self.des_y=y
         self.star=[float("inf")-10,0,0]
-        fig = plt.figure()
-        self.ax= fig.add_subplot(111)
+        fig = plt.figure(tight_layout=True)
+        self.ax= fig.add_subplot(111,autoscale_on=False, xlim=(0, self.dim), ylim=(0, self.dim))
         self.scats,=self.ax.plot([],[],color='r')
         self.lins,=self.ax.plot([], [], 'o-', lw=2)
         self.fitness=[]
