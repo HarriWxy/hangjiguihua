@@ -127,7 +127,7 @@ class Pso(object):
         self.star=[float("inf")-10,0,0]
         fig = plt.figure()
         self.ax= fig.add_subplot(111)
-        self.scats,=self.ax.plot([],[],"ro",color='r')
+        self.scats,=self.ax.plot([],[],color='r')
         self.lins,=self.ax.plot([], [], 'o-', lw=2)
         self.fitness=[]
         self.__init_Population()
@@ -242,13 +242,6 @@ class Pso(object):
 
             self.fThetatoX()
             self.scats.set_data(self.x[0],self.x[1])
-            x=[0.5]
-            y=[self.dim-0.5]
-            route=self.star[2]
-            for i in route:
-                x.append(i[1]+0.5)
-                y.append(self.dim-i[0]-0.5)
-            self.lins.set_data(x,y)
 
             for i in range(self.p_num):
                 temp=self.fit_func(self.x[i])
@@ -274,7 +267,7 @@ class Pso(object):
         # 画出无人机路径图,直线连接
         # 方格边长
         a=1
-        fig = plt.figure(tight_layout=True)
+        # fig = plt.figure(tight_layout=True)
         for i in range(self.dim+1):
             for j in range(self.dim+1):
                 if self.grid[i][j] > 0:
@@ -283,18 +276,18 @@ class Pso(object):
                     self.ax.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='grey',alpha=1)
         
         
-        x=[0.5]
-        y=[self.dim-0.5]
-        route=self.star[2]
-        for i in route:
-            x.append(i[1]+0.5)
-            y.append(self.dim-i[0]-0.5)
-        plt.plot(x,y)
-        plt.subplot(1,2,2)
+        # x=[0.5]
+        # y=[self.dim-0.5]
+        # route=self.star[2]
+        # for i in route:
+        #     x.append(i[1]+0.5)
+        #     y.append(self.dim-i[0]-0.5)
+        # plt.plot(x,y)
+        # plt.subplot(1,2,2)
         # self.trans(xxx)
         # plt.imshow(np.array(self.grid))
         # plt.plot(fitness)
-        ani=Animation.FuncAnimation(fig,self.iter,range(self.max_iter),interval=50, blit=True, init_func=self.animate_init)
+        ani=Animation.FuncAnimation(self.ax,self.iter,range(self.max_iter),interval=50, blit=True, init_func=self.animate_init)
         # 输出代价值
         fitness=np.array(self.fitness)
         print(fitness)
