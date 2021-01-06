@@ -115,7 +115,7 @@ class Pso(object):
         self.grid=self.Grid(dim+1).grid # 生成的网格图
         self.p_num = p_num  # 粒子数量
         self.dim = dim  
-        self.p_dim= 5 # 这是粒子的维度,后期考虑用ai调参
+        self.p_dim= 7 # 这是粒子的维度,后期考虑用ai调参
         self.max_iter = max_iter  # 迭代次数
         self.x = np.zeros((self.p_num, 2*self.p_dim))  # 所有粒子的位置和角度
         self.theta = np.zeros((self.p_num, 2*self.p_dim))
@@ -207,49 +207,49 @@ class Pso(object):
         F=1
         CR=0.5 # 选择变异的系数
         
-        for k in range(self.max_iter):
+        # for k in range(self.max_iter):
 
-            gamma=np.zeros_like(self.theta)
-            for i in range(self.p_num):
-                u = random.uniform(0,1)
-                gamma[i] = u*self.pbest[i] + (1-u)*self.gbest
-                for j in range(2*self.p_dim):
-                    if gamma[i][j] > np.pi/2:
-                        gamma[i][j]=np.pi/2
-                    elif gamma[i][j] < -np.pi/2:
-                        gamma[i][j]= -np.pi/2
-                
-            for i in range(self.p_num):
-                # mutation
-                li=list(range(self.p_num))
-                li.remove(i)
-                r = random.sample(li,3) # 随机选择的三个系数作为突变来源的选择
-                v = gamma[r[0]] + F*(gamma[r[1]] - gamma[r[2]]) # F是突变的系数
-                li=list(range(2*self.p_dim))
-                rnbr=random.sample(li,random.randint(1,self.p_dim))
-                for j in range(2*self.p_dim):
-                    # crossover
-                    if (random.random()<CR) or (j in rnbr):
-                        if v[j]>np.pi/2:
-                            v[j]=np.pi/2
-                        elif v[j]<-np.pi/2:
-                            v[j]=-np.pi/2
-                        self.theta[i][j] = v[j]
-                    else:
-                        self.theta[i][j]  = gamma[i][j]
+        gamma=np.zeros_like(self.theta)
+        for i in range(self.p_num):
+            u = random.uniform(0,1)
+            gamma[i] = u*self.pbest[i] + (1-u)*self.gbest
+            for j in range(2*self.p_dim):
+                if gamma[i][j] > np.pi/2:
+                    gamma[i][j]=np.pi/2
+                elif gamma[i][j] < -np.pi/2:
+                    gamma[i][j]= -np.pi/2
+            
+        for i in range(self.p_num):
+            # mutation
+            li=list(range(self.p_num))
+            li.remove(i)
+            r = random.sample(li,3) # 随机选择的三个系数作为突变来源的选择
+            v = gamma[r[0]] + F*(gamma[r[1]] - gamma[r[2]]) # F是突变的系数
+            li=list(range(2*self.p_dim))
+            rnbr=random.sample(li,random.randint(1,self.p_dim))
+            for j in range(2*self.p_dim):
+                # crossover
+                if (random.random()<CR) or (j in rnbr):
+                    if v[j]>np.pi/2:
+                        v[j]=np.pi/2
+                    elif v[j]<-np.pi/2:
+                        v[j]=-np.pi/2
+                    self.theta[i][j] = v[j]
+                else:
+                    self.theta[i][j]  = gamma[i][j]
 
-            self.fThetatoX()
+        self.fThetatoX()
 
-            for i in range(self.p_num):
+        for i in range(self.p_num):
+            temp=self.fit_func(self.x[i])
+            if temp < self.p_fit[i]: # 更新个体最优
                 temp=self.fit_func(self.x[i])
-                if temp < self.p_fit[i]: # 更新个体最优
-                    temp=self.fit_func(self.x[i])
-                    self.p_fit[i] = temp 
-                    self.pbest[i] = self.theta[i]
-                    if temp < self.fit:
-                        self.gbest=self.theta[i]
-                        self.fit=temp
-            self.fitness.append(self.fit)
+                self.p_fit[i] = temp 
+                self.pbest[i] = self.theta[i]
+                if temp < self.fit:
+                    self.gbest=self.theta[i]
+                    self.fit=temp
+        self.fitness.append(self.fit)
 
     def trans(self,x):  
         # 标注图像中的路径
@@ -283,29 +283,23 @@ def animate_init():
     scats.set_data([],[])
     return lins,scats
 def updateani(kk):
-    if kk<psodemo.max_iter-1:
-        psodemo.iter()
-        x=psodemo.x[0]
-        x=x.tolist()
-        y=psodemo.x[1]
-        y=y.tolist()
-        scats.set_data(x,y)
-    else:
+    psodemo.iter()
+    x=[0.5]
+    y=[psodemo.dim-0.5]
+    xxx=psodemo.fThetatoXmax()
+    for i in range(psodemo.p_dim):
+        x.append(int(xxx[psodemo.p_dim+i])+0.5)
+        y.append(psodemo.dim-int(xxx[i])-0.5)
+    x.append(psodemo.dim-0.5)
+    y.append(0.5)
+    scats.set_data(x,y)
+    if kk==psodemo.max_iter-1:
         x=[0.5]
         y=[psodemo.dim-0.5]
-        xxx=psodemo.fThetatoXmax()
-        for i in range(psodemo.p_dim):
-            x.append(int(xxx[psodemo.p_dim+i])+0.5)
-            y.append(psodemo.dim-int(xxx[i])-0.5)
-        x.append(psodemo.dim-0.5)
-        y.append(0.5)
-
-        x=[0.5]
-        y=[psodemo.dim-0.5]
-        # route=psodemo.star[2]
-        # for i in route:
-        #     x.append(i[1]+0.5)
-        #     y.append(psodemo.dim-i[0]-0.5)
+        route=psodemo.star[2]
+        for i in route:
+            x.append(i[1]+0.5)
+            y.append(psodemo.dim-i[0]-0.5)
         lins.set_data(x,y)
     return scats,lins
 
@@ -323,5 +317,5 @@ if __name__ == "__main__":
             else :
                 ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
     ani=Animation.FuncAnimation(fig,updateani,range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
-    ani.save('sin_test3.html', writer='pillow', fps=10)
+    ani.save('sin_test3.gif', writer='pillow')
     plt.show()
