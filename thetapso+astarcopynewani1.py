@@ -283,7 +283,7 @@ def animate_init():
     lins.setdata([],[])
     scats.setdata([],[])
     return lins,scats
-def updateani(psodemo):
+def updateani(kk):
     psodemo.iter()
     scats.set_data(psodemo.x[0],psodemo.x[1])
     x=[0.5]
@@ -308,5 +308,5 @@ if __name__ == "__main__":
                 ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
             else :
                 ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
-    ani=Animation.FuncAnimation(ax,updateani(psodemo),range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
+    ani=Animation.FuncAnimation(ax,updateani,range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
     
