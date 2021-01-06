@@ -302,11 +302,11 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111,autoscale_on=False, xlim=(0, psodemo.dim), ylim=(0,psodemo.dim))
     lins, = ax.plot([],[], 'o-', lw=2)
     scats, =ax.plot([],[],"ro",color='r')
-    for i in range(psodemo.dim+1):
-        for j in range(psodemo.dim+1):
-            if psodemo.grid[i][j] > 0:
-                ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
-            else :
-                ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
+    # for i in range(psodemo.dim+1):
+    #     for j in range(psodemo.dim+1):
+    #         if psodemo.grid[i][j] > 0:
+    #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
+    #         else :
+    #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
     ani=Animation.FuncAnimation(ax,updateani,range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
     
