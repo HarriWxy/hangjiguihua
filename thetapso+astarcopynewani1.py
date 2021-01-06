@@ -279,23 +279,34 @@ class Pso(object):
 
 
 def animate_init():
-    lins.setdata([],[])
-    scats.setdata([],[])
+    lins.set_data([],[])
+    scats.set_data([],[])
     return lins,scats
 def updateani(kk):
-    psodemo.iter()
-    x=psodemo.x[0]
-    x=x.tolist()
-    y=psodemo.x[1]
-    y=y.tolist()
-    scats.set_data(x,y)
-    x=[0.5]
-    y=[psodemo.dim-0.5]
-    # route=psodemo.star[2]
-    # for i in route:
-    #     x.append(i[1]+0.5)
-    #     y.append(psodemo.dim-i[0]-0.5)
-    lins.set_data(x,y)
+    if kk<psodemo.max_iter-1:
+        psodemo.iter()
+        x=psodemo.x[0]
+        x=x.tolist()
+        y=psodemo.x[1]
+        y=y.tolist()
+        scats.set_data(x,y)
+    else:
+        x=[0.5]
+        y=[psodemo.dim-0.5]
+        xxx=psodemo.fThetatoXmax()
+        for i in range(psodemo.p_dim):
+            x.append(int(xxx[psodemo.p_dim+i])+0.5)
+            y.append(psodemo.dim-int(xxx[i])-0.5)
+        x.append(psodemo.dim-0.5)
+        y.append(0.5)
+
+        x=[0.5]
+        y=[psodemo.dim-0.5]
+        # route=psodemo.star[2]
+        # for i in route:
+        #     x.append(i[1]+0.5)
+        #     y.append(psodemo.dim-i[0]-0.5)
+        lins.set_data(x,y)
     return scats,lins
 
 if __name__ == "__main__":
@@ -305,12 +316,12 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111,autoscale_on=False, xlim=(0, psodemo.dim), ylim=(0,psodemo.dim))
     lins, = ax.plot([],[], 'o-', lw=2)
     scats, =ax.plot([],[],"ro",color='r')
-    # for i in range(psodemo.dim+1):
-    #     for j in range(psodemo.dim+1):
-    #         if psodemo.grid[i][j] > 0:
-    #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
-    #         else :
-    #             ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
-    updateani(1)
+    for i in range(psodemo.dim+1):
+        for j in range(psodemo.dim+1):
+            if psodemo.grid[i][j] > 0:
+                ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
+            else :
+                ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
     ani=Animation.FuncAnimation(fig,updateani,range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
+    ani.save('sin_test3.html', writer='pillow', fps=10)
     plt.show()
