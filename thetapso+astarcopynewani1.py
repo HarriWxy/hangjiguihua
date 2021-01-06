@@ -260,14 +260,6 @@ class Pso(object):
         # 画出无人机路径图,直线连接
         # 方格边长
         a=1
-        fig = plt.figure(tight_layout=True)
-        for i in range(self.dim+1):
-            for j in range(self.dim+1):
-                if self.grid[i][j] > 0:
-                    self.ax.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='k',alpha=0.2)
-                else :
-                    self.ax.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='grey',alpha=1)
-        
         
         # x=[0.5]
         # y=[self.dim-0.5]
@@ -308,5 +300,11 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
     lins, = ax.plot([], [], 'o-', lw=2)
     scats, =ax.plot([],[],"ro",color='r')
-    ani=Animation.FuncAnimation(fig,updateani(psodemo),range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
+    for i in range(psodemo.dim+1):
+        for j in range(psodemo.dim+1):
+            if psodemo.grid[i][j] > 0:
+                ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='k',alpha=0.2)
+            else :
+                ax.fill_between([j,j+1,j+1,j],[psodemo.dim-i-1,psodemo.dim-i-1,psodemo.dim-i,psodemo.dim-i],color='grey',alpha=1)
+    ani=Animation.FuncAnimation(ax,updateani(psodemo),range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
     
