@@ -5,6 +5,8 @@ import random
 import matplotlib.pyplot as plt 
 from queue import PriorityQueue
 
+from numpy.lib.function_base import percentile
+
 class Pso(object):
     # 粒子群算法类
     class Grid(object):
@@ -125,10 +127,6 @@ class Pso(object):
         self.des_x=x # 目的
         self.des_y=y
         self.star=[float("inf")-10,0,0]
-        fig = plt.figure()
-        self.ax= fig.add_subplot(111)
-        self.scats,=self.ax.plot([],[],"ro",color='r')
-        self.lins,=self.ax.plot([], [], 'o-', lw=2)
         self.fitness=[]
         self.__init_Population()
 
@@ -204,7 +202,7 @@ class Pso(object):
                 self.fit=temp
                 self.gbest=self.theta[i]
     
-    def iter(self,temp):
+    def iter(self):
         # 迭代函数
         F=1
         CR=0.5 # 选择变异的系数
@@ -241,14 +239,6 @@ class Pso(object):
                         self.theta[i][j]  = gamma[i][j]
 
             self.fThetatoX()
-            self.scats.set_data(self.x[0],self.x[1])
-            x=[0.5]
-            y=[self.dim-0.5]
-            route=self.star[2]
-            for i in route:
-                x.append(i[1]+0.5)
-                y.append(self.dim-i[0]-0.5)
-            self.lins.set_data(x,y)
 
             for i in range(self.p_num):
                 temp=self.fit_func(self.x[i])
@@ -264,11 +254,7 @@ class Pso(object):
     def trans(self,x):  
         # 标注图像中的路径
         for i in range(self.p_dim): # 这里需要限制一下范围
-            self.grid[int(x[i])][int(x[self.p_dim+i])]=5
-            
-    def animate_init(self):
-        self.lins.setdata([],[])
-        self.scats.setdata([],[])
+            self.grid[int(x[i])][int(x[self.p_dim+i])]=5            
 
     def drawLine(self):
         # 画出无人机路径图,直线连接
@@ -283,25 +269,44 @@ class Pso(object):
                     self.ax.fill_between([j,j+1,j+1,j],[self.dim-i-1,self.dim-i-1,self.dim-i,self.dim-i],color='grey',alpha=1)
         
         
-        x=[0.5]
-        y=[self.dim-0.5]
-        route=self.star[2]
-        for i in route:
-            x.append(i[1]+0.5)
-            y.append(self.dim-i[0]-0.5)
-        plt.plot(x,y)
-        plt.subplot(1,2,2)
+        # x=[0.5]
+        # y=[self.dim-0.5]
+        # route=self.star[2]
+        # for i in route:
+        #     x.append(i[1]+0.5)
+        #     y.append(self.dim-i[0]-0.5)
+        # plt.plot(x,y)
+        # plt.subplot(1,2,2)
         # self.trans(xxx)
         # plt.imshow(np.array(self.grid))
         # plt.plot(fitness)
-        ani=Animation.FuncAnimation(fig,self.iter,range(self.max_iter),interval=50, blit=True, init_func=self.animate_init)
+        # ani=Animation.FuncAnimation(fig,self.iter,range(self.max_iter),interval=50, blit=True, init_func=self.animate_init)
         # 输出代价值
         fitness=np.array(self.fitness)
         print(fitness)
 
         plt.show()
 
+def animate_init():
+    lins.setdata([],[])
+    scats.setdata([],[])
+def updateani(psodemo):
+    psodemo.iter()
+    scats.set_data(psodemo.x[0],psodemo.x[1])
+    x=[0.5]
+    y=[psodemo.dim-0.5]
+    route=psodemo.star[2]
+    for i in route:
+        x.append(i[1]+0.5)
+        y.append(psodemo.dim-i[0]-0.5)
+    lins.set_data(x,y)
+
 if __name__ == "__main__":
     # 随机产生一张图
     psodemo=Pso(50,30,50,29,29)
-    psodemo.drawLine()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    lins, = ax.plot([], [], 'o-', lw=2)
+    scats, =ax.plot([],[],"ro",color='r')
+    ani=Animation.FuncAnimation(fig,updateani(psodemo),range(psodemo.max_iter),interval=50, blit=True, init_func=animate_init)
+    
