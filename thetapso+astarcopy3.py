@@ -252,12 +252,14 @@ class Pso(object):
         for i in range(self.p_dim): # 这里需要限制一下范围
             self.grid[int(x[i])][int(x[self.p_dim+i])]=5
             
-
+    def updatepoint(self,num):
+        
+        pass
     def drawLine(self):
         # 画出无人机路径图,直线连接
         # 方格边长
         a=1
-        plt.figure()
+        fig = plt.figure(tight_layout=True)
         fitness=np.array(self.iter())
         print(fitness)
         plt.subplot(1,2,1)
