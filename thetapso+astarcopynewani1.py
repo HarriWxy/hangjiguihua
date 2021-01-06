@@ -282,23 +282,25 @@ class Pso(object):
 def animate_init():
     lins.setdata([],[])
     scats.setdata([],[])
+    return lins,scats
 def updateani(psodemo):
     psodemo.iter()
     scats.set_data(psodemo.x[0],psodemo.x[1])
     x=[0.5]
     y=[psodemo.dim-0.5]
-    route=psodemo.star[2]
-    for i in route:
-        x.append(i[1]+0.5)
-        y.append(psodemo.dim-i[0]-0.5)
+    # route=psodemo.star[2]
+    # for i in route:
+    #     x.append(i[1]+0.5)
+    #     y.append(psodemo.dim-i[0]-0.5)
     lins.set_data(x,y)
+    return scats,lins
 
 if __name__ == "__main__":
     # 随机产生一张图
     psodemo=Pso(50,30,50,29,29)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    lins, = ax.plot([], [], 'o-', lw=2)
+    lins, = ax.plot([],[], 'o-', lw=2)
     scats, =ax.plot([],[],"ro",color='r')
     for i in range(psodemo.dim+1):
         for j in range(psodemo.dim+1):

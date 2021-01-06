@@ -253,7 +253,7 @@ class Pso(object):
                         self.gbest=self.theta[i]
                         self.fit=temp
             self.fitness.append(self.fit)
-            return self.scats
+        return self.scats
 
     def trans(self,x):  
         # 标注图像中的路径
@@ -263,6 +263,7 @@ class Pso(object):
     def animate_init(self):
         self.lins.setdata([],[])
         self.scats.setdata([],[])
+        return self.scats, self.lins
 
     def drawLine(self):
         # 画出无人机路径图,直线连接
